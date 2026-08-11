@@ -95,6 +95,9 @@
   .scene{position:absolute;inset:0;display:grid;place-items:center;overflow:hidden}
 
   .scene .photo{position:absolute;inset:0;background-size:cover;background-position:center;transform-origin:center}
+  .scene .bg-blur{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(30px) brightness(.42);transform:scale(1.15);transform-origin:center}
+  .scene .photo-fit{position:absolute;top:3%;left:4%;right:4%;bottom:22%;background-size:contain;background-repeat:no-repeat;background-position:center}
+  .scene .veil2{position:absolute;inset:0;background:linear-gradient(to top, rgba(0,8,26,.9) 0%, rgba(0,8,26,.35) 18%, rgba(0,8,26,0) 42%);pointer-events:none}
   .kb1{animation:kb1 var(--kb,7s) ease-out forwards}.kb2{animation:kb2 var(--kb,7s) ease-out forwards}
   .kb3{animation:kb3 var(--kb,7s) ease-out forwards}.kb4{animation:kb4 var(--kb,7s) ease-out forwards}
   @keyframes kb1{from{transform:scale(1.06)}to{transform:scale(1.22)}}
@@ -337,7 +340,10 @@
   function sceneHTML(sc,i){
     if(sc.type==='bossPhoto'){
       const cap = sc.msg ? '<div class="lower"><div class="bar"></div><div class="msg rev d2">'+esc(sc.msg)+'</div>'+(sc.by?'<div class="by rev d3">— '+esc(sc.by)+'</div>':'')+'</div>' : '';
-      return '<div class="scene"><div class="photo '+(reduce?'kb1':kb[i%4])+'" style="--kb:'+(state.perSlide+1)+'s;background-image:url(\''+sc.url+'\')"></div><div class="veil"></div><div class="frame"></div>'+cap+'</div>';
+      return '<div class="scene">'+
+        '<div class="bg-blur '+(reduce?'':kb[i%4])+'" style="--kb:'+(state.perSlide+2)+'s;background-image:url(\''+sc.url+'\')"></div>'+
+        '<div class="photo-fit" style="background-image:url(\''+sc.url+'\')"></div>'+
+        '<div class="veil2"></div>'+cap+'</div>';
     }
     if(sc.type==='wishText'){
       return '<div class="scene cover"><div class="glow"></div><div class="center"><div class="qm rev d1">&#8220;</div><div class="pmsg rev d2" style="max-width:900px;margin:0 auto">'+esc(sc.msg)+'</div>'+(sc.by?'<div class="by rev d3" style="margin-top:16px">— '+esc(sc.by)+'</div>':'')+'</div></div>';
