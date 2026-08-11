@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>อวยพรวันเกิด คุณส้ม · C.C. Content</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&family=Sarabun:wght@300;400&family=Charmonman:wght@700&display=swap" rel="stylesheet">
+<script src="firebase-config.js"></script>
+<style>
+  :root{--navy:#002050;--orange:#F5871F;--orange-soft:#ffb15a;--orange-deep:#d96f0c;--cream:#FBF6EE;--muted:#93a6c6}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Sarabun',sans-serif;min-height:100vh;color:var(--cream);
+    background:radial-gradient(1000px 700px at 50% -10%,#0a2c63,#002050 46%,#00102a 100%);
+    display:flex;align-items:center;justify-content:center;padding:30px 18px}
+  .box{width:100%;max-width:440px;text-align:center}
+  .logo{height:40px;filter:brightness(0) invert(1);margin-bottom:18px}
+  .k{font-family:'Charmonman',cursive;color:var(--orange-soft);font-size:32px;line-height:1}
+  h1{font-family:'Kanit',sans-serif;font-weight:600;font-size:34px;margin-top:2px}
+  p.sub{color:var(--muted);font-weight:300;margin-top:8px;margin-bottom:28px}
+  a.tile{display:block;text-decoration:none;color:var(--cream);background:rgba(6,20,46,.6);
+    border:1px solid rgba(245,135,31,.28);border-radius:18px;padding:20px 22px;margin-bottom:14px;text-align:left;transition:.18s}
+  a.tile:hover{border-color:var(--orange);transform:translateY(-2px)}
+  a.tile .ic{font-size:26px}
+  a.tile .t{font-family:'Kanit',sans-serif;font-weight:600;font-size:19px;margin-top:6px}
+  a.tile .d{color:var(--muted);font-size:13.5px;margin-top:3px}
+  a.primary{background:linear-gradient(135deg,rgba(245,135,31,.16),rgba(245,135,31,.06));border-color:var(--orange)}
+  .foot{color:#7f93b6;font-size:11.5px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="k">สุขสันต์วันเกิด</div>
+  <h1 id="name">คุณส้ม</h1>
+  <p class="sub">ร่วมส่งคำอวยพร แล้วมาฉายในงานกัน 🎉</p>
+
+  <a class="tile primary" href="form.html">
+    <div class="ic">✍️</div>
+    <div class="t">ร่วมอวยพร (สำหรับพนักงาน)</div>
+    <div class="d">กรอกชื่อ คำอวยพร และรูปของคุณ</div>
+  </a>
+  <a class="tile" href="slideshow.html">
+    <div class="ic">🎬</div>
+    <div class="t">เปิดสไลด์โชว์ (สำหรับผู้จัด)</div>
+    <div class="d">เพิ่มรูปคุณส้ม แล้วฉายในงาน</div>
+  </a>
+
+  <div class="foot">C.C. Content · Professional Cleaning &amp; Service</div>
+</div>
+<script>
+  document.getElementById('name').textContent = window.HONOREE_NAME || 'คุณส้ม';
+  document.title = 'อวยพรวันเกิด ' + (window.HONOREE_NAME||'คุณส้ม') + ' · ' + (window.COMPANY_NAME||'C.C. Content');
+</script>
+</body>
+</html>

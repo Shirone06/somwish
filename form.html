@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>ร่วมอวยพรวันเกิด</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600&family=Charmonman:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.9.3/confetti.browser.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<style>
+  :root{
+    --navy:#002050; --navy2:#0a2c63; --navy-deep:#001536;
+    --orange:#F5871F; --orange-soft:#ffb15a; --orange-deep:#d96f0c;
+    --cream:#FBF6EE; --ink:#0b1a33; --muted:#66768f; --line:#e7e0d4;
+    --head:'Kanit',sans-serif; --body:'Sarabun',sans-serif; --script:'Charmonman',cursive;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{min-height:100%}
+  body{
+    font-family:var(--body);color:var(--ink);
+    background:radial-gradient(1100px 700px at 50% -12%, #0a2c63 0%, #002050 45%, #001430 100%);
+    min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+    padding:26px 16px 60px;
+  }
+  .wrap{width:100%;max-width:520px}
+  .topbar{display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .topbar img{height:34px;filter:brightness(0) invert(1);opacity:.96}
+  .hero{text-align:center;color:var(--cream);margin-bottom:22px}
+  .hero .cake{font-size:34px}
+  .hero .k{font-family:var(--script);color:var(--orange-soft);font-size:30px;line-height:1;margin-top:2px}
+  .hero h1{font-family:var(--head);font-weight:600;font-size:clamp(24px,6vw,32px);margin-top:2px;letter-spacing:.3px}
+  .hero p{color:#b9c6de;font-weight:300;margin-top:8px;font-size:14.5px;line-height:1.6}
+  .counter{display:inline-flex;align-items:center;gap:7px;margin-top:14px;background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.16);color:var(--cream);padding:6px 14px;border-radius:30px;font-size:13px}
+  .counter b{color:var(--orange-soft);font-weight:600}
+
+  .card{background:var(--cream);border-radius:22px;padding:24px 20px 22px;box-shadow:0 30px 70px -30px rgba(0,10,40,.7)}
+  .field{margin-bottom:18px}
+  .field .lab{display:block;font-family:var(--head);font-weight:500;font-size:14.5px;margin-bottom:8px}
+  .field .lab .req{color:var(--orange-deep)}
+  input[type=text],textarea{
+    width:100%;background:#fff;border:1.5px solid var(--line);border-radius:13px;
+    font-family:var(--body);font-size:16px;color:var(--ink);padding:13px 14px;transition:.18s;
+  }
+  textarea{resize:vertical;min-height:110px;line-height:1.7}
+  input[type=text]:focus,textarea:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px rgba(245,135,31,.16)}
+  .hintline{color:var(--muted);font-size:12px;margin-top:6px}
+
+  .photo-pick{
+    display:flex;flex-direction:column;align-items:center;gap:12px;
+    border:1.5px dashed var(--line);border-radius:16px;padding:20px;cursor:pointer;transition:.18s;background:#fff;
+  }
+  .photo-pick:hover{border-color:var(--orange);background:#fffaf3}
+  .photo-pick .ph{width:96px;height:96px;border-radius:50%;background:#f0ece2;display:grid;place-items:center;
+    overflow:hidden;border:3px solid #fff;box-shadow:0 6px 18px -8px rgba(0,20,60,.4)}
+  .photo-pick .ph img{width:100%;height:100%;object-fit:cover}
+  .photo-pick .ph .cam{font-size:30px;opacity:.5}
+  .photo-pick .t{font-family:var(--head);font-weight:500;font-size:15px}
+  .photo-pick .s{color:var(--muted);font-size:12.5px;margin-top:-6px}
+  .photo-pick.done{border-style:solid;border-color:var(--orange-soft);background:#fffaf3}
+
+  .btn{
+    width:100%;border:none;border-radius:15px;padding:16px;cursor:pointer;
+    font-family:var(--head);font-weight:600;font-size:17px;letter-spacing:.3px;
+    background:linear-gradient(135deg,var(--orange-soft),var(--orange) 55%,var(--orange-deep));
+    color:#fff;box-shadow:0 16px 34px -14px rgba(245,135,31,.7);transition:transform .14s, box-shadow .2s;
+  }
+  .btn:hover{transform:translateY(-2px)}
+  .btn:disabled{opacity:.6;cursor:default;transform:none}
+  .status{text-align:center;font-size:13.5px;margin-top:12px;min-height:18px}
+  .status.err{color:var(--orange-deep)}
+
+  /* success */
+  .success{display:none;text-align:center;padding:12px 6px}
+  .success .big{width:88px;height:88px;border-radius:50%;margin:6px auto 14px;
+    background:linear-gradient(135deg,var(--orange-soft),var(--orange));display:grid;place-items:center;
+    color:#fff;font-size:44px;box-shadow:0 14px 30px -12px rgba(245,135,31,.7)}
+  .success h2{font-family:var(--head);font-weight:600;font-size:22px;color:var(--navy)}
+  .success p{color:var(--muted);margin-top:8px;font-size:14.5px;line-height:1.6}
+  .btn-ghost{margin-top:20px;background:transparent;border:1.5px solid var(--line);color:var(--navy);
+    padding:12px 22px;border-radius:12px;font-family:var(--head);font-weight:500;cursor:pointer;font-size:14px}
+  .btn-ghost:hover{border-color:var(--orange);color:var(--orange-deep)}
+
+  .cfgwarn{background:#fff3f0;border:1px solid #f3c4b3;color:#8a3410;border-radius:14px;
+    padding:14px 16px;font-size:13.5px;line-height:1.6;margin-bottom:18px;display:none}
+  .cfgwarn b{color:#6d260a}
+  .footer{text-align:center;color:#8ba0c2;font-size:11.5px;margin-top:20px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div class="cake">🎂</div>
+    <div class="k">สุขสันต์วันเกิด</div>
+    <h1 id="heroName">คุณส้ม</h1>
+    <p>ร่วมส่งคำอวยพรและรูปของคุณ<br>เพื่อนำไปฉายในงานวันเกิด</p>
+    <div class="counter" id="counter" style="display:none">🎉 ร่วมอวยพรแล้ว <b id="countNum">0</b> คน</div>
+  </div>
+
+  <div class="card">
+    <div class="cfgwarn" id="cfgwarn"><b>ยังไม่ได้ตั้งค่า Firebase</b><br>ผู้จัดทำต้องใส่ค่าในไฟล์ <b>firebase-config.js</b> ก่อน ระบบถึงจะรับคำอวยพรได้</div>
+
+    <div id="formArea">
+      <div class="field">
+        <span class="lab">ชื่อของคุณ <span class="req">*</span></span>
+        <input type="text" id="name" placeholder="เช่น สมหญิง (ฝ่ายบุคคล)" maxlength="80" autocomplete="name">
+      </div>
+      <div class="field">
+        <span class="lab">คำอวยพร <span class="req">*</span></span>
+        <textarea id="message" placeholder="เขียนคำอวยพรถึงคุณส้ม..." maxlength="600"></textarea>
+        <div class="hintline"><span id="msgCount">0</span>/600</div>
+      </div>
+      <div class="field">
+        <span class="lab">รูปของคุณ</span>
+        <label class="photo-pick" id="photoPick">
+          <div class="ph" id="ph"><span class="cam">📷</span></div>
+          <div class="t" id="photoT">แตะเพื่อเลือก / ถ่ายรูป</div>
+          <div class="s">ไม่ใส่ก็ได้ • ระบบจะย่อรูปให้อัตโนมัติ</div>
+          <input type="file" id="photo" accept="image/*" style="display:none">
+        </label>
+      </div>
+      <button class="btn" id="send">ส่งคำอวยพร 🎁</button>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="success" id="success">
+      <div class="big">✓</div>
+      <h2>ส่งเรียบร้อยแล้ว!</h2>
+      <p>ขอบคุณที่ร่วมส่งคำอวยพรให้คุณส้ม<br>คำอวยพรของคุณจะถูกนำไปฉายในงาน 🎉</p>
+      <button class="btn-ghost" id="again">ส่งอีกคน</button>
+    </div>
+  </div>
+
+  <div class="footer">C.C. Content · Professional Cleaning &amp; Service</div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = s => document.querySelector(s);
+  const honoree = window.HONOREE_NAME || "คุณส้ม";
+  $('#heroName').textContent = honoree;
+  document.title = 'ร่วมอวยพรวันเกิด ' + honoree;
+
+  // ---- Firebase init ----
+  const cfg = window.FIREBASE_CONFIG || {};
+  let db = null;
+  const configured = cfg.apiKey && String(cfg.apiKey).indexOf('PASTE') === -1;
+  if(configured){
+    try{ firebase.initializeApp(cfg); db = firebase.firestore(); }
+    catch(e){ console.error(e); }
+  }
+  if(!db){ $('#cfgwarn').style.display='block'; $('#send').disabled=true; }
+
+  // ---- live counter ----
+  function refreshCount(){
+    if(!db) return;
+    db.collection('wishes').get().then(s=>{
+      $('#countNum').textContent = s.size;
+      $('#counter').style.display = 'inline-flex';
+    }).catch(()=>{});
+  }
+  refreshCount();
+
+  // ---- char count ----
+  const msg = $('#message');
+  msg.addEventListener('input', ()=> $('#msgCount').textContent = msg.value.length);
+
+  // ---- photo pick + compress ----
+  let photoDataUrl = '';
+  const fileInput = $('#photo'), ph = $('#ph'), photoT = $('#photoT'), photoPick = $('#photoPick');
+
+  function loadImgEl(file){
+    return new Promise((res,rej)=>{
+      const img = new Image();
+      img.onload = ()=> res(img);
+      img.onerror = rej;
+      img.src = URL.createObjectURL(file);
+    });
+  }
+  async function compress(file, maxSide=900, quality=0.72){
+    let src, w, h;
+    try{
+      const bmp = await createImageBitmap(file, {imageOrientation:'from-image'});
+      src = bmp; w = bmp.width; h = bmp.height;
+    }catch(e){
+      const img = await loadImgEl(file); src = img; w = img.naturalWidth; h = img.naturalHeight;
+    }
+    const scale = Math.min(1, maxSide/Math.max(w,h));
+    w = Math.max(1, Math.round(w*scale)); h = Math.max(1, Math.round(h*scale));
+    const c = document.createElement('canvas'); c.width=w; c.height=h;
+    c.getContext('2d').drawImage(src,0,0,w,h);
+    let q = quality, url = c.toDataURL('image/jpeg', q);
+    while(url.length > 850000 && q > 0.4){ q -= 0.1; url = c.toDataURL('image/jpeg', q); }
+    return url;
+  }
+  fileInput.onchange = async e=>{
+    const f = e.target.files[0];
+    if(!f) return;
+    photoT.textContent = 'กำลังย่อรูป...';
+    try{
+      photoDataUrl = await compress(f);
+      ph.innerHTML = '<img src="'+photoDataUrl+'" alt="รูปของคุณ">';
+      photoT.textContent = 'เปลี่ยนรูป';
+      photoPick.classList.add('done');
+    }catch(err){
+      console.error(err); photoT.textContent = 'โหลดรูปไม่สำเร็จ ลองใหม่';
+    }
+  };
+
+  // ---- submit ----
+  const sendBtn = $('#send'), status = $('#status');
+  sendBtn.onclick = async ()=>{
+    if(!db) return;
+    const name = $('#name').value.trim();
+    const message = msg.value.trim();
+    status.className = 'status';
+    if(!name){ status.textContent='กรุณากรอกชื่อ'; status.classList.add('err'); return; }
+    if(!message){ status.textContent='กรุณากรอกคำอวยพร'; status.classList.add('err'); return; }
+
+    sendBtn.disabled = true; sendBtn.textContent = 'กำลังส่ง...';
+    try{
+      await db.collection('wishes').add({
+        name: name,
+        message: message,
+        photo: photoDataUrl || '',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      // success
+      $('#formArea').style.display='none';
+      $('#success').style.display='block';
+      if(typeof confetti!=='undefined'){
+        confetti({particleCount:130, spread:80, origin:{y:.5}, colors:['#F5871F','#ffb15a','#002050','#FBF6EE']});
+      }
+    }catch(err){
+      console.error(err);
+      status.textContent = 'ส่งไม่สำเร็จ: ' + (err && err.message ? err.message : 'ลองใหม่อีกครั้ง');
+      status.classList.add('err');
+      sendBtn.disabled=false; sendBtn.textContent='ส่งคำอวยพร 🎁';
+    }
+  };
+
+  $('#again').onclick = ()=>{
+    $('#name').value=''; msg.value=''; $('#msgCount').textContent='0';
+    photoDataUrl=''; ph.innerHTML='<span class="cam">📷</span>'; photoT.textContent='แตะเพื่อเลือก / ถ่ายรูป';
+    photoPick.classList.remove('done');
+    $('#success').style.display='none'; $('#formArea').style.display='block';
+    sendBtn.disabled=false; sendBtn.textContent='ส่งคำอวยพร 🎁';
+    refreshCount();
+  };
+})();
+</script>
+</body>
+</html>
