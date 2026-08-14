@@ -568,7 +568,7 @@
       return Math.min(14, Math.max(state.perSlide, 6) + Math.max(0,(L-140))/45);  // เวลาอ่านตามความยาว
     }
     if(sc.type==='title'||sc.type==='divider') return 5.5;
-    if(sc.type==='closing') return 8;
+    if(sc.type==='closing') return 9;
     return 5;
   }
   const kb=['kb1','kb2','kb3','kb4'];
@@ -706,14 +706,34 @@
   /* ---- engine ---- */
   const stage=$('#stage'), setup=$('#setup'), layers=[$('#layerA'),$('#layerB')], fill=$('#fill'), counter=$('#counter');
   function fireEffects(sc){
+    if(state.fwTimer){ clearInterval(state.fwTimer); state.fwTimer=null; }
     if(!state.confetti||reduce||typeof confetti==='undefined') return;
-    const C=['#F5871F','#ffb15a','#002050','#FBF6EE','#E4C068'];
+    const C=['#F5871F','#ffb15a','#002050','#FBF6EE','#E4C068','#ffffff'];
     if(sc.type==='title'){ confetti({particleCount:120,spread:75,origin:{y:.6},colors:C,scalar:1.1}); }
     else if(sc.type==='cake'){
       // พลุตอนเป่าเทียน (~ช่วงท้ายฉาก)
       setTimeout(()=>{ if(typeof confetti!=='undefined'){ confetti({particleCount:150,spread:100,origin:{y:.5},colors:C,scalar:1.15}); confetti({particleCount:80,angle:60,spread:70,origin:{x:0,y:.6},colors:C}); confetti({particleCount:80,angle:120,spread:70,origin:{x:1,y:.6},colors:C}); } }, 5200);
     }
-    else if(sc.type==='closing'){ const s=x=>confetti({particleCount:70,angle:x<.5?60:120,spread:65,origin:{x,y:.65},colors:C}); s(.1);s(.9);setTimeout(()=>{s(.25);s(.75);},350); }
+    else if(sc.type==='closing'){
+      // 🎆 พลุแตกต่อเนื่องหลายจุด สวยอลังการ
+      const end = performance.now() + 7200;
+      const shell=(x,y)=>{
+        confetti({particleCount:60,startVelocity:32,spread:360,ticks:110,gravity:.9,decay:.92,scalar:1.05,origin:{x,y},colors:C});
+        confetti({particleCount:26,startVelocity:20,spread:360,ticks:90,gravity:.9,decay:.9,scalar:.75,origin:{x,y},colors:C});
+      };
+      const cannon=(x)=>confetti({particleCount:90,angle:x<.5?60:120,spread:78,startVelocity:58,origin:{x,y:.72},colors:C});
+      // เปิดด้วยพลุชุดใหญ่
+      confetti({particleCount:170,spread:130,startVelocity:48,origin:{y:.62},colors:C,scalar:1.15});
+      cannon(.04); cannon(.96);
+      shell(.3,.32); shell(.7,.28);
+      // ยิงรัวต่อเนื่อง
+      state.fwTimer=setInterval(()=>{
+        if(performance.now()>end){ clearInterval(state.fwTimer); state.fwTimer=null; return; }
+        const n=1+((Math.random()*2)|0);
+        for(let b=0;b<n;b++) shell(.12+Math.random()*.76, .18+Math.random()*.42);
+        if(Math.random()<.45) cannon(Math.random()<.5?.04:.96);
+      }, 360);
+    }
   }
   function show(i){
     const n=state.scenes.length; if(!n) return;
@@ -766,7 +786,7 @@
     if(state.musicUrl){audio.currentTime=0;audio.volume=.7;audio.play().catch(()=>{});}
     resetIdle();
   };
-  function exitShow(){ pause(); audio.pause(); if(document.fullscreenElement)document.exitFullscreen().catch(()=>{}); stage.classList.remove('on'); setup.style.display='block'; if(state.rafId){cancelAnimationFrame(state.rafId);state.rafId=null;} }
+  function exitShow(){ pause(); audio.pause(); if(state.fwTimer){clearInterval(state.fwTimer);state.fwTimer=null;} if(document.fullscreenElement)document.exitFullscreen().catch(()=>{}); stage.classList.remove('on'); setup.style.display='block'; if(state.rafId){cancelAnimationFrame(state.rafId);state.rafId=null;} }
 
   /* ---- wish wall mode ---- */
   const wall=$('#wall');
