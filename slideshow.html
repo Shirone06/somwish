@@ -565,7 +565,7 @@
     if(sc.type==='bossPhoto'||sc.type==='wishText') return state.perSlide;
     if(sc.type==='person'){
       const L=(sc.msg||'').length;
-      return Math.min(22, Math.max(state.perSlide, 6) + L*0.075 + 1.6);  // ยาวพอให้พิมพ์จบ + เวลาอ่าน
+      return Math.min(14, Math.max(state.perSlide, 6) + Math.max(0,(L-140))/45);  // เวลาอ่านตามความยาว
     }
     if(sc.type==='title'||sc.type==='divider') return 5.5;
     if(sc.type==='closing') return 8;
@@ -692,7 +692,7 @@
           '<div class="pname rev d2">'+esc(sc.name||'')+'</div>'+
           badges+
           '<div class="prole-line rev d2"></div>'+
-          '<div class="pmsg rev d3 typing'+szc+'"></div>'+
+          '<div class="pmsg rev d3'+szc+'">'+esc(sc.msg||'')+'</div>'+
         '</div></div></div>';
     }
     // closing
@@ -726,31 +726,8 @@
     state.active=1-state.active; state.idx=i;
     counter.textContent=(i+1)+' / '+n;
     fireEffects(state.scenes[i]);
-    if(state.scenes[i].type==='person') startTypewriter(tgt, i);
-    else clearInterval(state.typeTimer);
     state.sceneStart=performance.now();
     schedule();
-  }
-  function startTypewriter(layer, sceneIdx){
-    clearInterval(state.typeTimer);
-    const el = layer.querySelector('.pmsg.typing');
-    if(!el) return;
-    const sc = state.scenes[sceneIdx] || {};
-    const full = (sc.msg != null ? String(sc.msg) : '');
-    // ตัวกันพลาด: ถ้าไม่มีข้อความ หรือปิดแอนิเมชัน → แสดงเต็มทันที
-    if(!full || reduce){ el.textContent = full; el.classList.remove('caret'); return; }
-    el.textContent=''; el.classList.add('caret');
-    let k=0;
-    const budget = sceneDuration(sc)*1000 - 1500;
-    const step = Math.max(35, Math.min(95, budget/Math.max(1,full.length)));
-    setTimeout(()=>{
-      try{
-        state.typeTimer = setInterval(()=>{
-          k++; el.textContent = full.slice(0,k);
-          if(k>=full.length){ clearInterval(state.typeTimer); el.classList.remove('caret'); }
-        }, step);
-      }catch(e){ el.textContent = full; el.classList.remove('caret'); }
-    }, 480);
   }
   function schedule(){ clearTimeout(state.timer); if(!state.playing) return; state.timer=setTimeout(()=>show(state.idx+1), sceneDuration(state.scenes[state.idx])*1000); }
   function tick(){ if(state.playing&&state.scenes.length){ const d=sceneDuration(state.scenes[state.idx])*1000; fill.style.right=(100-Math.min(1,(performance.now()-state.sceneStart)/d)*100)+'%'; } state.rafId=requestAnimationFrame(tick); }
