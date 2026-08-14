@@ -100,9 +100,11 @@
   /* ambient floating particles */
   .fx{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
   .fx i{position:absolute;bottom:-40px;border-radius:50%;display:block;
-    background:radial-gradient(circle at 35% 35%, var(--orange-soft), var(--orange) 60%, transparent 75%);
+    background:radial-gradient(circle at 35% 35%, #ffe9c9, var(--orange) 55%, transparent 78%);
+    box-shadow:0 0 10px 2px rgba(245,135,31,.65), 0 0 22px 6px rgba(245,135,31,.25);
     opacity:0;animation:floatUp linear infinite}
-  .fx i.g{background:radial-gradient(circle at 35% 35%, #fff2d8, #E4C068 60%, transparent 75%)}
+  .fx i.g{background:radial-gradient(circle at 35% 35%, #fff8e8, #E4C068 55%, transparent 78%);
+    box-shadow:0 0 10px 2px rgba(228,192,104,.7), 0 0 22px 6px rgba(228,192,104,.3)}
   @keyframes floatUp{
     0%{transform:translateY(0) translateX(0) scale(1);opacity:0}
     8%{opacity:var(--o,.5)}
@@ -503,15 +505,15 @@
   function buildFx(){
     if(reduce) return;
     const fx = $('#fx'); fx.innerHTML='';
-    for(let i=0;i<26;i++){
+    for(let i=0;i<38;i++){
       const s=document.createElement('i');
-      const sz=(Math.random()*7+3).toFixed(1);
+      const sz=(Math.random()*9+5).toFixed(1);
       s.style.width=sz+'px'; s.style.height=sz+'px';
       s.style.left=(Math.random()*100)+'%';
-      s.style.setProperty('--o',(Math.random()*.4+.18).toFixed(2));
-      s.style.setProperty('--dx',((Math.random()*120-60)|0)+'px');
-      s.style.animationDuration=(Math.random()*16+13).toFixed(1)+'s';
-      s.style.animationDelay=(-Math.random()*24).toFixed(1)+'s';
+      s.style.setProperty('--o',(Math.random()*.35+.55).toFixed(2));
+      s.style.setProperty('--dx',((Math.random()*140-70)|0)+'px');
+      s.style.animationDuration=(Math.random()*14+11).toFixed(1)+'s';
+      s.style.animationDelay=(-Math.random()*22).toFixed(1)+'s';
       if(Math.random()<.4) s.className='g';
       fx.appendChild(s);
     }
