@@ -219,32 +219,62 @@
     text-shadow:0 4px 30px rgba(0,0,0,.6)}
   .divider-sub{color:var(--muted);font-weight:300;margin-top:10px;font-size:clamp(14px,1.9vw,19px);letter-spacing:.5px}
 
-  /* ---- person scene: glass card ---- */
+  /* ---- person scene: glass card (upgraded) ---- */
   .person{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;
-    width:min(92%,860px);padding:0 4%}
+    width:min(92%,860px);padding:0 4%;perspective:1500px}
   .pcard{position:relative;width:100%;border-radius:26px;padding:34px 6% 34px;
     max-height:88vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;
+    --acc:245,135,31;
     background:linear-gradient(165deg, rgba(20,44,90,.72), rgba(4,16,40,.78));
-    border:1px solid rgba(245,135,31,.35);backdrop-filter:blur(8px);
-    box-shadow:0 40px 90px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.08);
-    animation:cardIn 1s cubic-bezier(.2,.75,.25,1) both .15s}
+    border:1px solid rgba(var(--acc),.5);backdrop-filter:blur(8px);
+    box-shadow:0 40px 90px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.08), 0 0 60px -20px rgba(var(--acc),.4);
+    transform-origin:center;animation:cardFlip 1s cubic-bezier(.2,.72,.28,1) both .1s}
+  @keyframes cardFlip{from{opacity:0;transform:rotateY(-72deg) translateZ(-50px)}60%{opacity:1}to{opacity:1;transform:none}}
+  .pcard.v0{--acc:245,135,31;background:linear-gradient(165deg, rgba(20,44,90,.72), rgba(4,16,40,.78))}
+  .pcard.v1{--acc:228,192,104;background:linear-gradient(200deg, rgba(28,40,78,.72), rgba(6,14,36,.8))}
+  .pcard.v2{--acc:140,175,235;background:linear-gradient(135deg, rgba(14,40,84,.74), rgba(4,16,40,.8))}
   .pcard:before{content:"";position:absolute;left:8%;right:8%;top:0;height:1px;
-    background:linear-gradient(90deg,transparent,rgba(245,135,31,.8),transparent)}
+    background:linear-gradient(90deg,transparent,rgba(var(--acc),.85),transparent)}
+  .pcard:after{content:"";position:absolute;top:-30%;right:-20%;width:60%;height:70%;border-radius:50%;
+    background:radial-gradient(circle, rgba(var(--acc),.12), transparent 70%);pointer-events:none}
+  /* ribbon pennant */
+  .pribbon{position:absolute;top:-2px;right:30px;width:32px;height:46px;z-index:4;
+    background:linear-gradient(rgb(var(--acc)), rgba(var(--acc),.7));
+    clip-path:polygon(0 0,100% 0,100% 100%,50% 80%,0 100%);box-shadow:0 6px 14px -6px rgba(0,0,0,.6)}
+  /* sequence pill */
+  .pseq{position:absolute;top:15px;left:16px;z-index:4;font-family:var(--display);font-style:italic;
+    color:rgb(var(--acc));background:rgba(0,10,30,.5);border:1px solid rgba(var(--acc),.5);
+    border-radius:20px;padding:4px 13px;font-size:14px}
   .avatar{width:clamp(120px,15vw,168px);height:clamp(120px,15vw,168px);border-radius:50%;object-fit:cover;display:block;
-    margin-bottom:16px;
-    border:4px solid var(--orange);box-shadow:0 14px 40px -14px rgba(0,0,0,.85), 0 0 0 10px rgba(245,135,31,.12), 0 0 40px rgba(245,135,31,.32);
-    animation:rev 1s cubic-bezier(.2,.7,.2,1) both}
+    margin-bottom:16px;position:relative;z-index:2;
+    border:4px solid rgb(var(--acc));box-shadow:0 14px 40px -14px rgba(0,0,0,.85), 0 0 0 10px rgba(var(--acc),.12), 0 0 40px rgba(var(--acc),.4)}
   .avatar-mono{display:grid;place-items:center;font-family:var(--head);font-weight:600;color:#fff;
-    background:linear-gradient(135deg,var(--navy2),var(--orange));font-size:clamp(44px,6vw,72px)}
-  .person .pname{font-family:var(--head);font-weight:600;font-size:clamp(24px,4vw,40px);color:var(--orange-soft);line-height:1.15;
-    text-shadow:0 2px 18px rgba(245,135,31,.35)}
-  .person .prole-line{width:46px;height:2px;margin:12px auto 14px;border-radius:2px;
-    background:linear-gradient(90deg,transparent,var(--orange),transparent)}
-  .person .pmsg{font-family:var(--body);font-weight:300;font-size:clamp(18px,2.7vw,29px);line-height:1.7;max-width:700px;margin:0 auto}
+    background:linear-gradient(135deg,var(--navy2),rgb(var(--acc)));font-size:clamp(44px,6vw,72px)}
+  /* rotating glow ring around avatar */
+  .avatar-ring{position:relative;margin-bottom:16px}
+  .avatar-ring:before{content:"";position:absolute;inset:-9px;border-radius:50%;z-index:1;
+    background:conic-gradient(from 0deg, transparent, rgba(var(--acc),.9), transparent 40%);
+    animation:spin 3.5s linear infinite;-webkit-mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px));
+    mask:radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px))}
+  .avatar-ring .avatar{margin-bottom:0}
+  .person .pname{font-family:var(--head);font-weight:600;font-size:clamp(24px,4vw,40px);color:rgb(var(--acc));line-height:1.15;
+    text-shadow:0 2px 18px rgba(var(--acc),.4);position:relative;z-index:2}
+  .pbadges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+  .pbadge{font-family:var(--head);font-weight:400;font-size:12.5px;color:#fff;
+    background:rgba(var(--acc),.16);border:1px solid rgba(var(--acc),.55);border-radius:20px;padding:4px 12px}
+  .person .prole-line{width:46px;height:2px;margin:14px auto;border-radius:2px;
+    background:linear-gradient(90deg,transparent,rgb(var(--acc)),transparent)}
+  .person .pmsg{font-family:var(--body);font-weight:300;font-size:clamp(18px,2.7vw,29px);line-height:1.7;max-width:700px;margin:0 auto;position:relative;z-index:2;min-height:1.7em}
   .person .pmsg.sz2{font-size:clamp(15px,2vw,22px);line-height:1.65;max-width:760px}
   .person .pmsg.sz3{font-size:clamp(13px,1.6vw,18px);line-height:1.6;max-width:800px}
-  .qm{position:absolute;top:24px;left:6%;font-family:var(--display);color:rgba(245,135,31,.3);
-    font-size:clamp(48px,7vw,88px);line-height:1;pointer-events:none}
+  .person .pmsg.caret::after{content:"▍";color:rgb(var(--acc));margin-left:1px;animation:blink .7s step-end infinite}
+  .qm{color:rgba(245,135,31,.4)}
+  @keyframes blink{50%{opacity:0}}
+  /* floating mood emojis behind card */
+  .emofx{position:absolute;inset:0;z-index:1;pointer-events:none;overflow:hidden}
+  .emofx span{position:absolute;bottom:-8%;opacity:0;filter:drop-shadow(0 3px 8px rgba(0,0,0,.4));
+    animation:emoUp linear infinite}
+  @keyframes emoUp{0%{opacity:0;transform:translateY(0) rotate(-8deg)}12%{opacity:.9}88%{opacity:.9}100%{opacity:0;transform:translateY(-112vh) rotate(12deg)}}
 
   .controls{position:fixed;left:0;right:0;bottom:0;z-index:60;padding:16px 20px 20px;background:linear-gradient(transparent,rgba(0,6,20,.65));display:flex;align-items:center;gap:12px;transition:opacity .4s}
   .stage.idle .controls{opacity:0;pointer-events:none}
@@ -316,6 +346,8 @@
     .rev,.photo-card,.pcard,.avatar{animation:none;opacity:1;transform:none}
     .sc-name{animation:none}.photo-card:after{animation:none;opacity:0}
     .fx{display:none}.ring{animation:none}.cover .glow{animation:none}
+    .avatar-ring:before{animation:none;opacity:.5}.emofx{display:none}
+    .pmsg.caret::after{display:none}
   }
 </style>
 </head>
@@ -514,8 +546,15 @@
     // ---- transition ----
     if(w.length){
       scenes.push({type:'divider', title:'คำอวยพรจากพวกเราทุกคน', sub: w.length+' คำอวยพรถึง '+honoree});
+      // badge: คำอวยพรยาวสุด
+      let longIdx=0; w.forEach((x,i)=>{ if((x.message||'').length > (w[longIdx].message||'').length) longIdx=i; });
       // ---- Part 2: each person ----
-      w.forEach(x=> scenes.push({type:'person', name:x.name, msg:x.message, photo:x.photo}));
+      w.forEach((x,i)=>{
+        const badges=[];
+        if(i===0) badges.push('first');
+        if(i===longIdx && i!==0) badges.push('longest');
+        scenes.push({type:'person', name:x.name, msg:x.message, photo:x.photo, idx:i+1, total:w.length, badges});
+      });
     }
     scenes.push({type:'closing'});
     state.scenes = scenes;
@@ -534,6 +573,17 @@
   }
   const kb=['kb1','kb2','kb3','kb4'];
   function monogram(name){ const ch=(name||'♥').trim().charAt(0)||'♥'; return esc(ch); }
+  function moodEmojis(msg){
+    const m=msg||'', out=[];
+    if(/สุขภาพ|แข็งแรง|health/i.test(m)) out.push('💪');
+    if(/รัก|เคารพ|love|❤|หัวใจ/i.test(m)) out.push('❤️');
+    if(/รวย|เงิน|ทอง|โบนัส|เฮง|ปัง|rich|money/i.test(m)) out.push('🧧');
+    if(/สุข|happy|ยิ้ม|joy|สดใส/i.test(m)) out.push('😊');
+    if(/สำเร็จ|success|เจริญ|ก้าวหน้า|รุ่งเรือง/i.test(m)) out.push('🌟');
+    if(/ขอบคุณ|thank|ปรารถนา|อวยพร/i.test(m)) out.push('🙏');
+    out.push('🎂','🎉','✨');
+    return [...new Set(out)].slice(0,6);
+  }
   const RINGS = '<div class="ring r1"></div><div class="ring r2"></div>';
   function scatter(n){
     const cols = n<=1?1:(n<=3?n:(n<=4?2:3));
@@ -617,12 +667,32 @@
         : '<div class="avatar avatar-mono">'+monogram(sc.name)+'</div>';
       const L = (sc.msg||'').length;
       const szc = L>420 ? ' sz3' : (L>230 ? ' sz2' : '');
-      return '<div class="scene cover">'+RINGS+'<div class="glow"></div><div class="person">'+
-        '<div class="pcard"><span class="qm">&#8220;</span>'+
-          av+
+      const variant = 'v'+((sc.idx-1)%3);
+      // badges
+      const bmap = {first:'🥇 คนแรกที่ส่ง', longest:'💌 คำอวยพรยาวสุด'};
+      const badges = (sc.badges&&sc.badges.length)
+        ? '<div class="pbadges">'+sc.badges.map(b=>'<span class="pbadge">'+bmap[b]+'</span>').join('')+'</div>' : '';
+      // floating mood emojis
+      const emo = moodEmojis(sc.msg);
+      let emofx='';
+      for(let k=0;k<9;k++){
+        const g=emo[(Math.random()*emo.length)|0];
+        const left=(Math.random()*100).toFixed(0);
+        const fs=(22+Math.random()*24).toFixed(0);
+        const dur=(9+Math.random()*7).toFixed(1);
+        const del=(Math.random()*10).toFixed(1);
+        emofx+='<span style="left:'+left+'%;font-size:'+fs+'px;animation-duration:'+dur+'s;animation-delay:'+del+'s">'+g+'</span>';
+      }
+      const seq = sc.total ? '<div class="pseq">'+sc.idx+' / '+sc.total+'</div>' : '';
+      return '<div class="scene cover">'+RINGS+'<div class="glow"></div>'+
+        '<div class="emofx">'+emofx+'</div>'+
+        '<div class="person"><div class="pcard '+variant+'">'+
+          '<div class="pribbon"></div>'+seq+
+          '<div class="avatar-ring">'+av+'</div>'+
           '<div class="pname rev d2">'+esc(sc.name||'')+'</div>'+
+          badges+
           '<div class="prole-line rev d2"></div>'+
-          '<div class="pmsg rev d3'+szc+'">'+esc(sc.msg||'')+'</div>'+
+          '<div class="pmsg rev d3 typing'+szc+'" data-full="'+esc(sc.msg||'')+'"></div>'+
         '</div></div></div>';
     }
     // closing
@@ -656,8 +726,28 @@
     state.active=1-state.active; state.idx=i;
     counter.textContent=(i+1)+' / '+n;
     fireEffects(state.scenes[i]);
+    if(state.scenes[i].type==='person') startTypewriter(tgt, i);
+    else clearInterval(state.typeTimer);
     state.sceneStart=performance.now();
     schedule();
+  }
+  function startTypewriter(layer, sceneIdx){
+    clearInterval(state.typeTimer);
+    const el = layer.querySelector('.pmsg.typing');
+    if(!el) return;
+    const full = el.getAttribute('data-full') || '';
+    el.textContent='';
+    el.classList.add('caret');
+    if(reduce){ el.textContent=full; el.classList.remove('caret'); return; }
+    let k=0;
+    const budget = sceneDuration(state.scenes[sceneIdx])*1000 - 2200;   // เว้นเวลาให้อ่านจบ
+    const step = Math.max(14, Math.min(46, budget/Math.max(1,full.length)));
+    setTimeout(()=>{
+      state.typeTimer = setInterval(()=>{
+        k++; el.textContent = full.slice(0,k);
+        if(k>=full.length){ clearInterval(state.typeTimer); el.classList.remove('caret'); }
+      }, step);
+    }, 480);
   }
   function schedule(){ clearTimeout(state.timer); if(!state.playing) return; state.timer=setTimeout(()=>show(state.idx+1), sceneDuration(state.scenes[state.idx])*1000); }
   function tick(){ if(state.playing&&state.scenes.length){ const d=sceneDuration(state.scenes[state.idx])*1000; fill.style.right=(100-Math.min(1,(performance.now()-state.sceneStart)/d)*100)+'%'; } state.rafId=requestAnimationFrame(tick); }
