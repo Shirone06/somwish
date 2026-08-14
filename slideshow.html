@@ -80,6 +80,11 @@
   .musicname{color:var(--orange-soft);font-size:12px;margin-top:6px}
 
   .start-wrap{text-align:center;margin-top:30px}
+  .btn-wall{display:inline-block;margin-top:14px;font-family:var(--head);font-weight:500;font-size:15px;
+    background:transparent;border:1px solid var(--line);color:var(--orange-soft);border-radius:13px;padding:12px 26px;cursor:pointer;transition:.2s}
+  .btn-wall:hover{background:rgba(245,135,31,.1);border-color:var(--orange);transform:translateY(-2px)}
+  .cake-toggle{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;color:var(--muted);font-size:13.5px;cursor:pointer}
+  .cake-toggle input{accent-color:var(--orange);width:16px;height:16px}
   .btn-start{font-family:var(--head);font-weight:600;font-size:18px;letter-spacing:.4px;
     background:linear-gradient(135deg,var(--orange-soft),var(--orange) 55%,var(--orange-deep));color:#fff;border:none;border-radius:15px;
     padding:15px 44px;cursor:pointer;box-shadow:0 16px 36px -14px rgba(245,135,31,.65);transition:transform .15s}
@@ -253,6 +258,59 @@
   .exit-hint{position:fixed;top:16px;right:18px;z-index:60;color:var(--muted);font-size:12px;background:rgba(4,16,40,.6);padding:6px 12px;border-radius:20px;border:1px solid var(--line);transition:opacity .4s}
   .stage.idle .exit-hint{opacity:0}
 
+  /* ---- cake intro scene ---- */
+  .cakewrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center}
+  .cake{position:relative;width:min(64vw,340px);height:min(46vw,250px)}
+  .plate{position:absolute;bottom:0;left:-8%;width:116%;height:18px;border-radius:50%;
+    background:radial-gradient(ellipse at 50% 35%, #f3ead9, #cbbfa1 60%, #b89f79);box-shadow:0 12px 30px -10px rgba(0,0,0,.7)}
+  .tier{position:absolute;left:50%;transform:translateX(-50%);border-radius:12px 12px 6px 6px;
+    background:linear-gradient(#f8e6cf,#eacaa3 60%,#e3c092);box-shadow:inset 0 7px 0 rgba(255,255,255,.35), 0 6px 18px -6px rgba(0,0,0,.5)}
+  .tier.b{bottom:14px;width:86%;height:46%;background:linear-gradient(#f7e2c8,#e6c39a)}
+  .tier.t{bottom:calc(14px + 44%);width:60%;height:34%;background:linear-gradient(#fbeede,#f3c9d6 60%,#eeb6c7)}
+  .frost{position:absolute;left:50%;transform:translateX(-50%);height:12px;border-radius:8px;
+    background:#fff7ef;box-shadow:0 3px 0 rgba(0,0,0,.05)}
+  .frost.b{bottom:calc(14px + 46% - 6px);width:86%}
+  .frost.t{bottom:calc(14px + 44% + 34% - 6px);width:60%}
+  .cherry{position:absolute;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ff8aa0,#d22c4e);box-shadow:0 0 8px rgba(210,44,78,.6)}
+  .candle{position:absolute;bottom:calc(14px + 44% + 34% - 2px);width:9px;height:44px;border-radius:3px;
+    background:repeating-linear-gradient(-45deg,#ff9db4 0 7px,#fff 7px 14px);box-shadow:0 2px 6px rgba(0,0,0,.3)}
+  .flame{position:absolute;top:-19px;left:50%;width:14px;height:22px;
+    border-radius:50% 50% 50% 50%/62% 62% 38% 38%;transform:translateX(-50%);transform-origin:50% 90%;
+    background:radial-gradient(circle at 50% 72%, #fff6c2, #ffbf3a 42%, #ff6a00 74%, transparent 80%);
+    filter:drop-shadow(0 -2px 12px rgba(255,150,20,.95));
+    animation:flick .45s ease-in-out infinite alternate, blowout var(--cd,6.5s) forwards}
+  @keyframes flick{from{transform:translateX(-50%) scaleY(.94) rotate(-3deg)}to{transform:translateX(-50%) scaleY(1.16) rotate(3deg)}}
+  @keyframes blowout{0%,78%{opacity:1}90%{opacity:.15}100%{opacity:0}}
+  .smoke{position:absolute;top:-24px;left:50%;width:6px;height:6px;border-radius:50%;background:rgba(220,220,220,.6);opacity:0;
+    animation:smoke var(--cd,6.5s) forwards}
+  @keyframes smoke{0%,80%{opacity:0;transform:translate(-50%,0) scale(.5)}88%{opacity:.55}100%{opacity:0;transform:translate(-50%,-46px) scale(1.7)}}
+  .cake-text .k{font-family:var(--script);color:var(--orange-soft);font-size:clamp(30px,5vw,52px);line-height:1;text-shadow:0 0 26px rgba(245,135,31,.5)}
+  .cake-text .s{color:var(--muted);font-weight:300;font-size:clamp(14px,2vw,19px);margin-top:6px}
+
+  /* ---- wish wall mode ---- */
+  .wall{position:fixed;inset:0;display:none;z-index:55;overflow:hidden;
+    background:radial-gradient(1200px 800px at 50% -10%, #0d3068 0%, #002050 48%, #000c22 100%)}
+  .wall.on{display:block}
+  .wall .whead{position:absolute;top:0;left:0;right:0;z-index:3;text-align:center;padding:22px 10px 34px;
+    background:linear-gradient(rgba(0,10,30,.85),transparent)}
+  .wall .whead .k{font-family:var(--script);color:var(--orange-soft);font-size:clamp(30px,4.6vw,52px);line-height:1;text-shadow:0 0 24px rgba(245,135,31,.5)}
+  .wall .whead .s{color:var(--muted);font-weight:300;font-size:clamp(13px,1.7vw,17px);margin-top:2px}
+  .wallcols{position:absolute;inset:0;display:flex;gap:16px;padding:18px}
+  .wcol{flex:1;overflow:hidden;position:relative;-webkit-mask-image:linear-gradient(transparent, #000 12%, #000 88%, transparent);mask-image:linear-gradient(transparent, #000 12%, #000 88%, transparent)}
+  .wtrack{display:flex;flex-direction:column;gap:16px;position:absolute;top:0;left:0;right:0;animation:wallUp linear infinite}
+  @keyframes wallUp{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+  .wcard{background:linear-gradient(160deg, rgba(20,44,90,.6), rgba(4,16,40,.72));border:1px solid rgba(245,135,31,.3);
+    border-radius:16px;padding:16px 18px;box-shadow:0 16px 40px -22px rgba(0,0,0,.7)}
+  .wcard .wn{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .wcard .wa{width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--orange);flex:none;
+    display:grid;place-items:center;font-family:var(--head);color:#fff;background:linear-gradient(135deg,var(--navy2),var(--orange));font-size:16px}
+  .wcard .wname{font-family:var(--head);font-weight:500;color:var(--orange-soft);font-size:15px;line-height:1.2}
+  .wcard .wmsg{font-family:var(--body);font-weight:300;color:var(--cream);font-size:14.5px;line-height:1.6}
+  .wclose{position:fixed;top:16px;right:18px;z-index:60;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);
+    background:rgba(4,16,40,.8);color:var(--cream);cursor:pointer;display:grid;place-items:center}
+  .wclose:hover{background:var(--orange);color:#20140a}
+  .wclose svg{width:19px;height:19px;fill:currentColor}
+
   @media (prefers-reduced-motion: reduce){
     .kb1,.kb2,.kb3,.kb4{animation:none;transform:scale(1.06)}
     .rev,.photo-card,.pcard,.avatar{animation:none;opacity:1;transform:none}
@@ -315,7 +373,9 @@
 
   <div class="start-wrap">
     <button class="btn-start" id="startBtn">▶ เริ่มโชว์</button>
-    <div class="hint">ในหน้าโชว์: <b>F</b> เต็มจอ · <b>เว้นวรรค</b> เล่น/หยุด · <b>ลูกศร</b> เลื่อน · <b>Esc</b> ออก</div>
+    <button class="btn-wall" id="wallBtn">🧱 โหมดผนังคำอวยพร</button>
+    <label class="cake-toggle"><input type="checkbox" id="cakeIntro" checked> เปิดด้วยหน้าเค้กเป่าเทียน 🎂</label>
+    <div class="hint">ในหน้าโชว์: <b>F</b> เต็มจอ · <b>เว้นวรรค</b> เล่น/หยุด · <b>ลูกศร</b> เลื่อน · <b>Esc</b> ออก<br><b>ผนังคำอวยพร</b> = เปิดคลอตอนคนทยอยเข้างาน คำอวยพรทุกคนไหลขึ้นเป็นกำแพง</div>
   </div>
 </div>
 
@@ -337,6 +397,13 @@
     <button class="cbtn" id="exitBtn" aria-label="ออก"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg></button>
   </div>
   <audio id="audio" loop></audio>
+</div>
+
+<!-- ============ WISH WALL ============ -->
+<div class="wall" id="wall">
+  <div class="whead"><div class="k" id="wallTitle">คำอวยพรถึงคุณส้ม</div><div class="s">ร่วมส่งคำอวยพรได้ที่หน้าฟอร์ม แล้วมาปรากฏบนกำแพงนี้</div></div>
+  <div class="wallcols" id="wallcols"></div>
+  <button class="wclose" id="wallClose" aria-label="ออก"><svg viewBox="0 0 24 24"><path d="M6.4 5 5 6.4 10.6 12 5 17.6 6.4 19 12 13.4 17.6 19 19 17.6 13.4 12 19 6.4 17.6 5 12 10.6z"/></svg></button>
 </div>
 
 <script>
@@ -428,6 +495,7 @@
   function buildScenes(){
     const w = state.wishes, bp = state.bossPhotos;
     const scenes = [];
+    if(state.cakeIntro) scenes.push({type:'cake'});
     scenes.push({type:'title'});
     // ---- Part 1: photos drop into frames + floating wishes (กระชับ 1-3 สไลด์) ----
     if(bp.length){
@@ -453,6 +521,7 @@
     state.scenes = scenes;
   }
   function sceneDuration(sc){
+    if(sc.type==='cake') return 6.5;
     if(sc.type==='photodrop') return Math.max(8, sc.urls.length*0.7 + 5);
     if(sc.type==='bossPhoto'||sc.type==='wishText') return state.perSlide;
     if(sc.type==='person'){
@@ -483,6 +552,21 @@
     return out;
   }
   function sceneHTML(sc,i){
+    if(sc.type==='cake'){
+      const cd = '6.5s';
+      const candle = (x)=>'<div class="candle" style="left:'+x+'%"><div class="flame" style="--cd:'+cd+'"></div><div class="smoke" style="--cd:'+cd+'"></div></div>';
+      return '<div class="scene cover">'+RINGS+'<div class="glow"></div><div class="cakewrap">'+
+        '<div class="cake">'+
+          '<div class="plate"></div>'+
+          '<div class="tier b"></div><div class="frost b"></div>'+
+          '<div class="tier t"></div><div class="frost t"></div>'+
+          '<div class="cherry" style="left:30%;bottom:calc(14px + 44% + 34% - 20px)"></div>'+
+          '<div class="cherry" style="left:66%;bottom:calc(14px + 44% + 34% - 16px)"></div>'+
+          candle(38)+candle(50)+candle(62)+
+        '</div>'+
+        '<div class="cake-text"><div class="k rev d2">สุขสันต์วันเกิด '+esc(honoree)+'</div><div class="s rev d3">อธิษฐานในใจ แล้วเป่าเทียนพร้อมกันเลย! 🎂</div></div>'+
+      '</div></div>';
+    }
     if(sc.type==='photodrop'){
       const pos = scatter(sc.urls.length);
       const polas = sc.urls.map((u,k)=>{
@@ -555,6 +639,10 @@
     if(!state.confetti||reduce||typeof confetti==='undefined') return;
     const C=['#F5871F','#ffb15a','#002050','#FBF6EE','#E4C068'];
     if(sc.type==='title'){ confetti({particleCount:120,spread:75,origin:{y:.6},colors:C,scalar:1.1}); }
+    else if(sc.type==='cake'){
+      // พลุตอนเป่าเทียน (~ช่วงท้ายฉาก)
+      setTimeout(()=>{ if(typeof confetti!=='undefined'){ confetti({particleCount:150,spread:100,origin:{y:.5},colors:C,scalar:1.15}); confetti({particleCount:80,angle:60,spread:70,origin:{x:0,y:.6},colors:C}); confetti({particleCount:80,angle:120,spread:70,origin:{x:1,y:.6},colors:C}); } }, 5200);
+    }
     else if(sc.type==='closing'){ const s=x=>confetti({particleCount:70,angle:x<.5?60:120,spread:65,origin:{x,y:.65},colors:C}); s(.1);s(.9);setTimeout(()=>{s(.25);s(.75);},350); }
   }
   function show(i){
@@ -597,6 +685,7 @@
   }
 
   $('#startBtn').onclick=()=>{
+    state.cakeIntro = $('#cakeIntro').checked;
     buildScenes();
     if(state.scenes.length<=1){ alert('ยังไม่มีรูปคุณส้มและยังไม่มีคำอวยพร\nกรุณาเพิ่มรูป หรือรอให้มีคนส่งคำอวยพรก่อนครับ'); return; }
     setup.style.display='none'; stage.classList.add('on');
@@ -608,13 +697,53 @@
     resetIdle();
   };
   function exitShow(){ pause(); audio.pause(); if(document.fullscreenElement)document.exitFullscreen().catch(()=>{}); stage.classList.remove('on'); setup.style.display='block'; if(state.rafId){cancelAnimationFrame(state.rafId);state.rafId=null;} }
+
+  /* ---- wish wall mode ---- */
+  const wall=$('#wall');
+  function wcardHTML(x){
+    const av = x.photo
+      ? '<img class="wa" src="'+x.photo+'" alt="">'
+      : '<div class="wa">'+monogram(x.name)+'</div>';
+    return '<div class="wcard"><div class="wn">'+av+'<div class="wname">'+esc(x.name||'')+'</div></div>'+
+      '<div class="wmsg">'+esc(x.message||'')+'</div></div>';
+  }
+  function openWall(){
+    const w = state.wishes.slice();
+    if(!w.length){ alert('ยังไม่มีคำอวยพรให้แสดงบนกำแพงครับ'); return; }
+    $('#wallTitle').textContent = 'คำอวยพรถึง '+honoree;
+    const vw = window.innerWidth;
+    const cols = vw>1400?4:(vw>900?3:(vw>560?2:1));
+    const cont = $('#wallcols'); cont.innerHTML='';
+    // แจกการ์ดลงคอลัมน์
+    const buckets = Array.from({length:cols},()=>[]);
+    w.forEach((x,i)=> buckets[i%cols].push(x));
+    buckets.forEach((items,ci)=>{
+      // การ์ดน้อยไป ให้ทำซ้ำจนพอเลื่อน
+      let list = items.slice();
+      while(list.length && list.length<6) list = list.concat(items);
+      const inner = list.map(wcardHTML).join('');
+      const col=document.createElement('div'); col.className='wcol';
+      const track=document.createElement('div'); track.className='wtrack';
+      track.innerHTML = inner + inner;   // ซ้ำ 2 ชุดเพื่อวนไร้รอยต่อ
+      const dur = (list.length*4.5 + 18 + ci*3).toFixed(0);   // แต่ละคอลัมน์เร็วไม่เท่ากัน
+      track.style.animationDuration = dur+'s';
+      if(ci%2===1){ track.style.animationDirection='reverse'; }
+      col.appendChild(track); cont.appendChild(col);
+    });
+    setup.style.display='none';
+    wall.classList.add('on');
+  }
+  function closeWall(){ wall.classList.remove('on'); $('#wallcols').innerHTML=''; setup.style.display='block'; }
+  $('#wallBtn').onclick = openWall;
+  $('#wallClose').onclick = closeWall;
+
   $('#exitBtn').onclick=exitShow; $('#playBtn').onclick=toggle;
   $('#nextBtn').onclick=()=>show(state.idx+1); $('#prevBtn').onclick=()=>show(state.idx-1);
 
   const musicIcon=$('#musicIcon');
   $('#musicToggle').onclick=()=>{ if(!state.musicUrl)return; if(audio.paused){audio.play().catch(()=>{});musicIcon.style.opacity='1';} else {audio.pause();musicIcon.style.opacity='.4';} };
   $('#fsBtn').onclick=()=>{ if(!document.fullscreenElement)(document.documentElement.requestFullscreen||(()=>{})).call(document.documentElement).catch(()=>{}); else document.exitFullscreen().catch(()=>{}); };
-  document.addEventListener('keydown',e=>{ if(!stage.classList.contains('on'))return;
+  document.addEventListener('keydown',e=>{ if(wall.classList.contains('on')){ if(e.key==='Escape') closeWall(); return; } if(!stage.classList.contains('on'))return;
     if(e.key===' '){e.preventDefault();toggle();} else if(e.key==='ArrowRight')show(state.idx+1);
     else if(e.key==='ArrowLeft')show(state.idx-1); else if(e.key==='f'||e.key==='F')$('#fsBtn').click();
     else if(e.key==='Escape'){ if(!document.fullscreenElement)exitShow(); } });
