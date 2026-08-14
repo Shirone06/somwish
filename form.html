@@ -159,10 +159,10 @@
   // ---- live counter ----
   function refreshCount(){
     if(!db) return;
-    db.collection('wishes').get().then(s=>{
+    db.collection('wishes').onSnapshot(s=>{
       $('#countNum').textContent = s.size;
       $('#counter').style.display = 'inline-flex';
-    }).catch(()=>{});
+    }, ()=>{});
   }
   refreshCount();
 

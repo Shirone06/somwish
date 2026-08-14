@@ -251,14 +251,23 @@
   if(configured){ try{ firebase.initializeApp(cfg); db = firebase.firestore(); }catch(e){ console.error(e); } }
   if(!db) $('#cfgwarn').style.display='block';
 
+  let wishUnsub = null;
   function loadWishes(){
     if(!db){ $('#wishCount').textContent='0'; $('#wishStatus').textContent='ยังไม่ได้ตั้งค่า Firebase'; return; }
-    $('#wishStatus').textContent='กำลังโหลด...';
-    db.collection('wishes').orderBy('createdAt','asc').get().then(snap=>{
-      state.wishes = snap.docs.map(d=>{ const x=d.data(); return {name:x.name||'', message:x.message||'', photo:x.photo||''}; });
-      $('#wishCount').textContent = state.wishes.length;
-      $('#wishStatus').textContent = state.wishes.length ? 'พร้อมฉาย ✓ (กดรีเฟรชถ้ามีคนส่งเพิ่ม)' : 'ยังไม่มีใครส่งคำอวยพร';
-    }).catch(err=>{
+    $('#wishStatus').textContent='กำลังเชื่อมต่อ...';
+    if(wishUnsub) wishUnsub();
+    // เชื่อมแบบเรียลไทม์ — เพิ่ม/ลบใน Console ขึ้นทันที ไม่ต้องรีเฟรช
+    wishUnsub = db.collection('wishes').onSnapshot(snap=>{
+      const arr = snap.docs.map(d=>{
+        const x=d.data();
+        const t = (x.createdAt && x.createdAt.toMillis) ? x.createdAt.toMillis() : 0;
+        return {name:x.name||'', message:x.message||'', photo:x.photo||'', _t:t};
+      });
+      arr.sort((a,b)=> a._t - b._t);   // เรียงตามเวลา ฝั่งเว็บ (ไม่ทิ้งอันที่ไม่มี createdAt)
+      state.wishes = arr;
+      $('#wishCount').textContent = arr.length;
+      $('#wishStatus').textContent = arr.length ? ('เชื่อมสดแล้ว ✓ ('+arr.length+' คน)') : 'ยังไม่มีใครส่งคำอวยพร';
+    }, err=>{
       console.error(err);
       $('#wishCount').textContent='!'; $('#wishStatus').textContent='โหลดไม่สำเร็จ: '+(err.message||'ตรวจสอบ Rules/การตั้งค่า');
     });
