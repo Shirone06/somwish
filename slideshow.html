@@ -191,31 +191,29 @@
   /* ---- person scene: glass card ---- */
   .person{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;
     width:min(92%,860px);padding:0 4%}
-  .pcard{position:relative;width:100%;border-radius:26px;
-    padding:calc(clamp(140px,19vw,200px)/2 + 30px) 6% 36px;
-    max-height:86vh;display:flex;flex-direction:column;justify-content:flex-start;
+  .pcard{position:relative;width:100%;border-radius:26px;padding:34px 6% 34px;
+    max-height:88vh;overflow:hidden;display:flex;flex-direction:column;align-items:center;
     background:linear-gradient(165deg, rgba(20,44,90,.72), rgba(4,16,40,.78));
     border:1px solid rgba(245,135,31,.35);backdrop-filter:blur(8px);
     box-shadow:0 40px 90px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.08);
     animation:cardIn 1s cubic-bezier(.2,.75,.25,1) both .15s}
   .pcard:before{content:"";position:absolute;left:8%;right:8%;top:0;height:1px;
     background:linear-gradient(90deg,transparent,rgba(245,135,31,.8),transparent)}
-  .avatar-hold{position:absolute;top:0;left:50%;transform:translate(-50%,-50%);
-    animation:revAv 1s cubic-bezier(.2,.7,.2,1) both}
-  @keyframes revAv{from{opacity:0;transform:translate(-50%,-28%)}to{opacity:1;transform:translate(-50%,-50%)}}
-  .avatar{width:clamp(140px,19vw,200px);height:clamp(140px,19vw,200px);border-radius:50%;object-fit:cover;display:block;
-    border:4px solid var(--orange);box-shadow:0 18px 46px -14px rgba(0,0,0,.85), 0 0 0 12px rgba(245,135,31,.12), 0 0 46px rgba(245,135,31,.35)}
+  .avatar{width:clamp(120px,15vw,168px);height:clamp(120px,15vw,168px);border-radius:50%;object-fit:cover;display:block;
+    margin-bottom:16px;
+    border:4px solid var(--orange);box-shadow:0 14px 40px -14px rgba(0,0,0,.85), 0 0 0 10px rgba(245,135,31,.12), 0 0 40px rgba(245,135,31,.32);
+    animation:rev 1s cubic-bezier(.2,.7,.2,1) both}
   .avatar-mono{display:grid;place-items:center;font-family:var(--head);font-weight:600;color:#fff;
-    background:linear-gradient(135deg,var(--navy2),var(--orange));font-size:clamp(52px,8vw,84px)}
-  .person .pname{font-family:var(--head);font-weight:600;font-size:clamp(25px,4.2vw,42px);color:var(--orange-soft);line-height:1.15;
+    background:linear-gradient(135deg,var(--navy2),var(--orange));font-size:clamp(44px,6vw,72px)}
+  .person .pname{font-family:var(--head);font-weight:600;font-size:clamp(24px,4vw,40px);color:var(--orange-soft);line-height:1.15;
     text-shadow:0 2px 18px rgba(245,135,31,.35)}
-  .person .prole-line{width:46px;height:2px;margin:14px auto;border-radius:2px;
+  .person .prole-line{width:46px;height:2px;margin:12px auto 14px;border-radius:2px;
     background:linear-gradient(90deg,transparent,var(--orange),transparent)}
   .person .pmsg{font-family:var(--body);font-weight:300;font-size:clamp(18px,2.7vw,29px);line-height:1.7;max-width:700px;margin:0 auto}
   .person .pmsg.sz2{font-size:clamp(15px,2vw,22px);line-height:1.65;max-width:760px}
   .person .pmsg.sz3{font-size:clamp(13px,1.6vw,18px);line-height:1.6;max-width:800px}
-  .qm{position:absolute;top:clamp(56px,9vw,92px);left:7%;font-family:var(--display);color:rgba(245,135,31,.35);
-    font-size:clamp(60px,9vw,110px);line-height:1;pointer-events:none}
+  .qm{position:absolute;top:24px;left:6%;font-family:var(--display);color:rgba(245,135,31,.3);
+    font-size:clamp(48px,7vw,88px);line-height:1;pointer-events:none}
 
   .controls{position:fixed;left:0;right:0;bottom:0;z-index:60;padding:16px 20px 20px;background:linear-gradient(transparent,rgba(0,6,20,.65));display:flex;align-items:center;gap:12px;transition:opacity .4s}
   .stage.idle .controls{opacity:0;pointer-events:none}
@@ -231,8 +229,7 @@
 
   @media (prefers-reduced-motion: reduce){
     .kb1,.kb2,.kb3,.kb4{animation:none;transform:scale(1.06)}
-    .rev,.photo-card,.pcard{animation:none;opacity:1;transform:none}
-    .avatar-hold{animation:none;opacity:1;transform:translate(-50%,-50%)}
+    .rev,.photo-card,.pcard,.avatar{animation:none;opacity:1;transform:none}
     .sc-name{animation:none}.photo-card:after{animation:none;opacity:0}
     .fx{display:none}.ring{animation:none}.cover .glow{animation:none}
   }
@@ -468,7 +465,7 @@
       const szc = L>420 ? ' sz3' : (L>230 ? ' sz2' : '');
       return '<div class="scene cover">'+RINGS+'<div class="glow"></div><div class="person">'+
         '<div class="pcard"><span class="qm">&#8220;</span>'+
-          '<div class="avatar-hold">'+av+'</div>'+
+          av+
           '<div class="pname rev d2">'+esc(sc.name||'')+'</div>'+
           '<div class="prole-line rev d2"></div>'+
           '<div class="pmsg rev d3'+szc+'">'+esc(sc.msg||'')+'</div>'+
