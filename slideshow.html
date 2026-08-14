@@ -286,6 +286,7 @@
   .progress .fill{position:absolute;inset:0 100% 0 0;background:linear-gradient(90deg,var(--orange-soft),var(--orange));border-radius:4px;transition:right .3s linear}
   .counter2{font-family:var(--display);font-style:italic;color:var(--orange-soft);font-size:14px;min-width:52px;text-align:center}
   .exit-hint{position:fixed;top:16px;right:18px;z-index:60;color:var(--muted);font-size:12px;background:rgba(4,16,40,.6);padding:6px 12px;border-radius:20px;border:1px solid var(--line);transition:opacity .4s}
+  .fwcanvas{position:fixed;inset:0;pointer-events:none;z-index:58;display:none}
   .stage.idle .exit-hint{opacity:0}
 
   /* ---- cake intro scene ---- */
@@ -417,6 +418,7 @@
   <div class="layer" id="layerA"></div>
   <div class="layer" id="layerB"></div>
   <div class="corners"><b></b><b></b><b></b><b></b></div>
+  <canvas class="fwcanvas" id="fwcanvas"></canvas>
   <div class="exit-hint">Esc เพื่อออก</div>
   <div class="controls" id="controls">
     <button class="cbtn" id="prevBtn" aria-label="ก่อนหน้า"><svg viewBox="0 0 24 24"><path d="M6 5h2v14H6zM20 5v14l-11-7z"/></svg></button>
@@ -705,34 +707,74 @@
 
   /* ---- engine ---- */
   const stage=$('#stage'), setup=$('#setup'), layers=[$('#layerA'),$('#layerB')], fill=$('#fill'), counter=$('#counter');
+
+  /* ---- self-contained canvas fireworks (ไม่พึ่ง CDN) ---- */
+  const fwCanvas=$('#fwcanvas'), fwCtx=fwCanvas.getContext('2d');
+  const FWC=['#F5871F','#ffb15a','#FFD98A','#E4C068','#ffffff','#ffd0a0','#7fb0ff'];
+  let fwParticles=[], fwRockets=[], fwRAF=null, fwActive=false;
+  function fwResize(){ fwCanvas.width=window.innerWidth; fwCanvas.height=window.innerHeight; }
+  window.addEventListener('resize', ()=>{ if(fwCanvas.style.display==='block') fwResize(); });
+  function fwLaunch(){
+    const x=window.innerWidth*(0.12+Math.random()*0.76);
+    const ty=window.innerHeight*(0.12+Math.random()*0.34);
+    fwRockets.push({x,y:window.innerHeight+4,ty,vy:-(window.innerHeight/78+Math.random()*3),color:FWC[(Math.random()*FWC.length)|0]});
+  }
+  function fwExplode(x,y,color){
+    const n=48+((Math.random()*40)|0), base=Math.random()*6.283;
+    for(let i=0;i<n;i++){
+      const a=base+(i/n)*6.283+(Math.random()*0.3), sp=1.2+Math.random()*5.2;
+      fwParticles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,decay:0.008+Math.random()*0.012,
+        color:(Math.random()<0.28?'#ffffff':color),size:1.4+Math.random()*2.1});
+    }
+  }
+  function fwLoop(){
+    fwCtx.clearRect(0,0,fwCanvas.width,fwCanvas.height);
+    fwCtx.globalCompositeOperation='lighter';
+    for(let i=fwRockets.length-1;i>=0;i--){
+      const r=fwRockets[i]; r.y+=r.vy; r.vy+=0.08;
+      fwCtx.globalAlpha=1; fwCtx.fillStyle=r.color;
+      fwCtx.beginPath(); fwCtx.arc(r.x,r.y,2.4,0,7); fwCtx.fill();
+      if(r.vy>=-0.5 || r.y<=r.ty){ fwExplode(r.x,r.y,r.color); fwRockets.splice(i,1); }
+    }
+    for(let i=fwParticles.length-1;i>=0;i--){
+      const p=fwParticles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.045; p.vx*=0.985; p.vy*=0.99; p.life-=p.decay;
+      if(p.life<=0){ fwParticles.splice(i,1); continue; }
+      fwCtx.globalAlpha=Math.max(0,p.life); fwCtx.fillStyle=p.color;
+      fwCtx.beginPath(); fwCtx.arc(p.x,p.y,p.size,0,7); fwCtx.fill();
+    }
+    fwCtx.globalAlpha=1; fwCtx.globalCompositeOperation='source-over';
+    if(fwActive||fwParticles.length||fwRockets.length){ fwRAF=requestAnimationFrame(fwLoop); }
+    else { fwRAF=null; fwCanvas.style.display='none'; }
+  }
+  function startFireworks(ms){
+    if(reduce) return;
+    fwResize(); fwCanvas.style.display='block'; fwActive=true;
+    for(let k=0;k<6;k++) setTimeout(fwLaunch,k*110);
+    clearInterval(state.fwTimer);
+    const end=performance.now()+ms;
+    state.fwTimer=setInterval(()=>{
+      if(performance.now()>end){ clearInterval(state.fwTimer); state.fwTimer=null; fwActive=false; return; }
+      const n=1+((Math.random()*3)|0); for(let b=0;b<n;b++) fwLaunch();
+    },300);
+    if(!fwRAF) fwLoop();
+  }
+  function stopFireworks(){ if(state.fwTimer){clearInterval(state.fwTimer);state.fwTimer=null;} fwActive=false; fwParticles=[]; fwRockets=[]; fwCanvas.style.display='none'; }
+
   function fireEffects(sc){
-    if(state.fwTimer){ clearInterval(state.fwTimer); state.fwTimer=null; }
-    if(!state.confetti||reduce||typeof confetti==='undefined') return;
+    if(sc.type!=='closing') stopFireworks();
+    if(reduce) return;
     const C=['#F5871F','#ffb15a','#002050','#FBF6EE','#E4C068','#ffffff'];
-    if(sc.type==='title'){ confetti({particleCount:120,spread:75,origin:{y:.6},colors:C,scalar:1.1}); }
+    const cf = (typeof confetti!=='undefined');
+    if(!state.confetti) return;
+    if(sc.type==='title'){ if(cf) confetti({particleCount:120,spread:75,origin:{y:.6},colors:C,scalar:1.1}); }
     else if(sc.type==='cake'){
-      // พลุตอนเป่าเทียน (~ช่วงท้ายฉาก)
-      setTimeout(()=>{ if(typeof confetti!=='undefined'){ confetti({particleCount:150,spread:100,origin:{y:.5},colors:C,scalar:1.15}); confetti({particleCount:80,angle:60,spread:70,origin:{x:0,y:.6},colors:C}); confetti({particleCount:80,angle:120,spread:70,origin:{x:1,y:.6},colors:C}); } }, 5200);
+      setTimeout(()=>{ if(typeof confetti!=='undefined'){ confetti({particleCount:150,spread:100,origin:{y:.5},colors:C,scalar:1.15}); confetti({particleCount:80,angle:60,spread:70,origin:{x:0,y:.6},colors:C}); confetti({particleCount:80,angle:120,spread:70,origin:{x:1,y:.6},colors:C}); } else { startFireworks(2500); } }, 5200);
     }
     else if(sc.type==='closing'){
-      // 🎆 พลุแตกต่อเนื่องหลายจุด สวยอลังการ
-      const end = performance.now() + 7200;
-      const shell=(x,y)=>{
-        confetti({particleCount:60,startVelocity:32,spread:360,ticks:110,gravity:.9,decay:.92,scalar:1.05,origin:{x,y},colors:C});
-        confetti({particleCount:26,startVelocity:20,spread:360,ticks:90,gravity:.9,decay:.9,scalar:.75,origin:{x,y},colors:C});
-      };
-      const cannon=(x)=>confetti({particleCount:90,angle:x<.5?60:120,spread:78,startVelocity:58,origin:{x,y:.72},colors:C});
-      // เปิดด้วยพลุชุดใหญ่
-      confetti({particleCount:170,spread:130,startVelocity:48,origin:{y:.62},colors:C,scalar:1.15});
-      cannon(.04); cannon(.96);
-      shell(.3,.32); shell(.7,.28);
-      // ยิงรัวต่อเนื่อง
-      state.fwTimer=setInterval(()=>{
-        if(performance.now()>end){ clearInterval(state.fwTimer); state.fwTimer=null; return; }
-        const n=1+((Math.random()*2)|0);
-        for(let b=0;b<n;b++) shell(.12+Math.random()*.76, .18+Math.random()*.42);
-        if(Math.random()<.45) cannon(Math.random()<.5?.04:.96);
-      }, 360);
+      // 🎆 พลุ canvas ของเราเอง (ขึ้นแน่ ไม่ต้องพึ่ง CDN)
+      startFireworks(8000);
+      // ถ้าไลบรารีคอนเฟตติโหลดได้ ก็โปรยเสริมให้ฟูขึ้น
+      if(cf){ confetti({particleCount:160,spread:130,startVelocity:48,origin:{y:.62},colors:C,scalar:1.15}); }
     }
   }
   function show(i){
@@ -786,7 +828,7 @@
     if(state.musicUrl){audio.currentTime=0;audio.volume=.7;audio.play().catch(()=>{});}
     resetIdle();
   };
-  function exitShow(){ pause(); audio.pause(); if(state.fwTimer){clearInterval(state.fwTimer);state.fwTimer=null;} if(document.fullscreenElement)document.exitFullscreen().catch(()=>{}); stage.classList.remove('on'); setup.style.display='block'; if(state.rafId){cancelAnimationFrame(state.rafId);state.rafId=null;} }
+  function exitShow(){ pause(); audio.pause(); stopFireworks(); if(document.fullscreenElement)document.exitFullscreen().catch(()=>{}); stage.classList.remove('on'); setup.style.display='block'; if(state.rafId){cancelAnimationFrame(state.rafId);state.rafId=null;} }
 
   /* ---- wish wall mode ---- */
   const wall=$('#wall');
