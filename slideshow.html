@@ -191,7 +191,9 @@
   /* ---- person scene: glass card ---- */
   .person{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;
     width:min(92%,860px);padding:0 4%}
-  .pcard{position:relative;width:100%;border-radius:26px;padding:clamp(84px,12vw,120px) 6% 40px;
+  .pcard{position:relative;width:100%;border-radius:26px;
+    padding:calc(clamp(140px,19vw,200px)/2 + 30px) 6% 36px;
+    max-height:86vh;display:flex;flex-direction:column;justify-content:flex-start;
     background:linear-gradient(165deg, rgba(20,44,90,.72), rgba(4,16,40,.78));
     border:1px solid rgba(245,135,31,.35);backdrop-filter:blur(8px);
     box-shadow:0 40px 90px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.08);
@@ -209,6 +211,8 @@
   .person .prole-line{width:46px;height:2px;margin:14px auto;border-radius:2px;
     background:linear-gradient(90deg,transparent,var(--orange),transparent)}
   .person .pmsg{font-family:var(--body);font-weight:300;font-size:clamp(18px,2.7vw,29px);line-height:1.7;max-width:700px;margin:0 auto}
+  .person .pmsg.sz2{font-size:clamp(15px,2vw,22px);line-height:1.65;max-width:760px}
+  .person .pmsg.sz3{font-size:clamp(13px,1.6vw,18px);line-height:1.6;max-width:800px}
   .qm{position:absolute;top:clamp(56px,9vw,92px);left:7%;font-family:var(--display);color:rgba(245,135,31,.35);
     font-size:clamp(60px,9vw,110px);line-height:1;pointer-events:none}
 
@@ -419,7 +423,10 @@
   }
   function sceneDuration(sc){
     if(sc.type==='bossPhoto'||sc.type==='wishText') return state.perSlide;
-    if(sc.type==='person') return Math.max(state.perSlide, 6);
+    if(sc.type==='person'){
+      const L=(sc.msg||'').length;
+      return Math.min(16, Math.max(state.perSlide, 6) + Math.max(0,(L-160))/55);
+    }
     if(sc.type==='title'||sc.type==='divider') return 5.5;
     if(sc.type==='closing') return 8;
     return 5;
@@ -456,12 +463,14 @@
       const av = sc.photo
         ? '<img class="avatar" src="'+sc.photo+'" alt="'+esc(sc.name)+'">'
         : '<div class="avatar avatar-mono">'+monogram(sc.name)+'</div>';
+      const L = (sc.msg||'').length;
+      const szc = L>420 ? ' sz3' : (L>230 ? ' sz2' : '');
       return '<div class="scene cover">'+RINGS+'<div class="glow"></div><div class="person">'+
         '<div class="pcard"><span class="qm">&#8220;</span>'+
           '<div class="avatar-hold">'+av+'</div>'+
           '<div class="pname rev d2">'+esc(sc.name||'')+'</div>'+
           '<div class="prole-line rev d2"></div>'+
-          '<div class="pmsg rev d3">'+esc(sc.msg||'')+'</div>'+
+          '<div class="pmsg rev d3'+szc+'">'+esc(sc.msg||'')+'</div>'+
         '</div></div></div>';
     }
     // closing
