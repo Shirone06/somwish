@@ -11,7 +11,7 @@ window.FIREBASE_CONFIG = {
 };
 
 // ชื่อผู้รับคำอวยพร (แสดงในหน้าฟอร์มและสไลด์)
-window.HONOREE_NAME = "คุณส้ม";
+window.HONOREE_NAME = "บอสส้ม";
 
 // ชื่อบริษัท (แสดงตอนปิดสไลด์)
 window.COMPANY_NAME = "C.C. Content";
