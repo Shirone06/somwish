@@ -692,7 +692,7 @@
           '<div class="pname rev d2">'+esc(sc.name||'')+'</div>'+
           badges+
           '<div class="prole-line rev d2"></div>'+
-          '<div class="pmsg rev d3 typing'+szc+'" data-full="'+esc(sc.msg||'')+'"></div>'+
+          '<div class="pmsg rev d3 typing'+szc+'"></div>'+
         '</div></div></div>';
     }
     // closing
@@ -735,18 +735,21 @@
     clearInterval(state.typeTimer);
     const el = layer.querySelector('.pmsg.typing');
     if(!el) return;
-    const full = el.getAttribute('data-full') || '';
-    el.textContent='';
-    el.classList.add('caret');
-    if(reduce){ el.textContent=full; el.classList.remove('caret'); return; }
+    const sc = state.scenes[sceneIdx] || {};
+    const full = (sc.msg != null ? String(sc.msg) : '');
+    // ตัวกันพลาด: ถ้าไม่มีข้อความ หรือปิดแอนิเมชัน → แสดงเต็มทันที
+    if(!full || reduce){ el.textContent = full; el.classList.remove('caret'); return; }
+    el.textContent=''; el.classList.add('caret');
     let k=0;
-    const budget = sceneDuration(state.scenes[sceneIdx])*1000 - 2200;   // เว้นเวลาให้อ่านจบ
+    const budget = sceneDuration(sc)*1000 - 2200;
     const step = Math.max(14, Math.min(46, budget/Math.max(1,full.length)));
     setTimeout(()=>{
-      state.typeTimer = setInterval(()=>{
-        k++; el.textContent = full.slice(0,k);
-        if(k>=full.length){ clearInterval(state.typeTimer); el.classList.remove('caret'); }
-      }, step);
+      try{
+        state.typeTimer = setInterval(()=>{
+          k++; el.textContent = full.slice(0,k);
+          if(k>=full.length){ clearInterval(state.typeTimer); el.classList.remove('caret'); }
+        }, step);
+      }catch(e){ el.textContent = full; el.classList.remove('caret'); }
     }, 480);
   }
   function schedule(){ clearTimeout(state.timer); if(!state.playing) return; state.timer=setTimeout(()=>show(state.idx+1), sceneDuration(state.scenes[state.idx])*1000); }
